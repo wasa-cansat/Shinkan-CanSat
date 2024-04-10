@@ -8,11 +8,16 @@
 BluetoothSerial SerialBT;
 
 void forward(uint32_t pwm);
-void backward(uint32_t pwm);
-void left(uint32_t pwm);
-void right(uint32_t pwm);
-void stop(void);
+void slowly_left(uint32_t pwm);
+void rapidly_left(uint32_t pwm);
+void slowly_right(uint32_t pwm);
 void nothing(void);
+void back_slowly_left(uint32_t pwm);
+void rapidly_right(uint32_t pwm);
+void back_slowly_right(uint32_t pwm);
+void backward(uint32_t pwm);
+void stop(void);
+
 
 uint32_t pwm = 200;
 bool boost = false;
@@ -43,18 +48,32 @@ void loop() {
     char ch = SerialBT.read();     // 受信した文字を得る
     Serial.println(ch);            // 受信した文字をシリアルモニタに出力
 
-
-    if (ch == '0') {
+    if (ch == '9') {
       forward(pwm);
+    }
+    else if (ch == '8') {
+      slowly_left(pwm);
+    }
+    else if (ch == '7') {
+      rapidly_left(pwm);
+    }
+    else if (ch == '6') {
+      slowly_right(pwm);
+    }
+    else if (ch == '5') {
+      nothing();
+    }
+    else if (ch == '4') {
+      back_slowly_left(pwm);
+    }
+    else if (ch == '3') {
+      rapidly_right(pwm);
+    }
+    else if (ch == '2') {
+      back_slowly_right(pwm);
     }
     else if (ch == '1') {
       backward(pwm);
-    }
-    else if (ch == '2') {
-      left(pwm);
-    }
-    else if (ch == '3') {
-      right(pwm);
     }
     else{
       stop();
@@ -71,38 +90,57 @@ void forward(uint32_t pwm) {
   ledcWrite(2,pwm);
   ledcWrite(3,0);
 }
-
+void slowly_left(uint32_t pwm) {
+  ledcWrite(0,pwm);
+  ledcWrite(1,0);
+  ledcWrite(2,0);
+  ledcWrite(3,0);
+}
+void rapidly_left(uint32_t pwm) {
+  ledcWrite(0,pwm);
+  ledcWrite(1,0);
+  ledcWrite(2,0);
+  ledcWrite(3,pwm);
+}
+void slowly_right(uint32_t pwm) {
+  ledcWrite(0,0);
+  ledcWrite(1,0);
+  ledcWrite(2,pwm);
+  ledcWrite(3,0);
+}
+void nothing(void){
+  ledcWrite(0,0);
+  ledcWrite(1,0);
+  ledcWrite(2,0);
+  ledcWrite(3,0);
+}
+void back_slowly_left(uint32_t pwm) {
+  ledcWrite(0,0);
+  ledcWrite(1,0);
+  ledcWrite(2,0);
+  ledcWrite(3,pwm);
+}
+void rapidly_right(uint32_t pwm) {
+  ledcWrite(0,0);
+  ledcWrite(1,pwm);
+  ledcWrite(2,pwm);
+  ledcWrite(3,0);
+}
+void back_slowly_right(uint32_t pwm) {
+  ledcWrite(0,0);
+  ledcWrite(1,pwm);
+  ledcWrite(2,0);
+  ledcWrite(3,0);
+}
 void backward(uint32_t pwm) {
   ledcWrite(0,0);
   ledcWrite(1,pwm);
   ledcWrite(2,0);
   ledcWrite(3,pwm);
 }
-
-void left(uint32_t pwm) {
-  ledcWrite(0,pwm);
-  ledcWrite(1,0);
-  ledcWrite(2,0);
-  ledcWrite(3,pwm);
-}
-
-void right(uint32_t pwm) {
-  ledcWrite(0,0);
-  ledcWrite(1,pwm);
-  ledcWrite(2,pwm);
-  ledcWrite(3,0);
-}
-
 void stop(void){
-  ledcWrite(0,250);
-  ledcWrite(1,250);
-  ledcWrite(2,250);
-  ledcWrite(3,250);
-}
-
-void nothing(void){
-  ledcWrite(0,0);
-  ledcWrite(1,0);
-  ledcWrite(2,0);
-  ledcWrite(3,0);
+  ledcWrite(0,255);
+  ledcWrite(1,255);
+  ledcWrite(2,255);
+  ledcWrite(3,255);
 }

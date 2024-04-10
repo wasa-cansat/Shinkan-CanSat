@@ -1,1 +1,4 @@
-9C9C1FCBE1C
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            ser.close()
+            done = True
