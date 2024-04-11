@@ -1,120 +1,86 @@
-import itertools
 import time
 import pygame
 import serial
 import serial.tools.list_ports 
 
 pygame.init()
-clock = pygame.time.Clock()
 pygame.joystick.init()
-joystick = pygame.joystick.Joystick(0)
-joystick.init()
 
+target_name = "Gamepad F310" #controller name
+desired_hwid_part = "9C9C1FCBD5EE" #Bluetooth ID
+target_controller = None
 ports = list(serial.tools.list_ports.comports())
-desired_hwid_part = "9C9C1FCBD5EE"
+
+if pygame.joystick.get_count() == 0: # ゲームパッドが接続されているか確認
+    print("No controllers found.")
+    quit()
+
+for i in range(pygame.joystick.get_count()): # 指定の名前を含むゲームパッドを探す
+    joystick = pygame.joystick.Joystick(i)
+    joystick.init()
+    if target_name in joystick.get_name():
+        target_controller = joystick
+        print("Target controller found:", target_controller.get_name())
+        break
+
+if target_controller is None:
+    print("Target controller not found.")
+    quit()
 
 for p in ports:
     if desired_hwid_part in p.hwid:
-        print("ESP32_2のポートを見つけました:", p.name) #p.hwid 
+        print("ESP32_1のポートを見つけました:", p.name) #p.hwid 
         ser = serial.Serial(port=p.device, baudrate=9600)
         break
         
 #Main program
 done = False
-while not done:
-    for event in pygame.event.get():
+while True:
+    while not done:
+        print("Event")
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
 
-        last_input_time = time.time()  # Initialize time of last input
-        current_time = last_input_time
-        time_difference = 0
+                ser.close()
+                done = True
 
-        if event.type == pygame.QUIT:
-            ser.close()
-            done = True
+        # 左スティックの値を取得
+        n = target_controller.get_axis(1)
+        m = target_controller.get_axis(3)
 
-        #Left Stick
-        n = joystick.get_axis(1)
-        if -0.4>n :
-            while True:
-                n =joystick.get_axis(1)
-                ser.write(b'0')
-                print('0')
-                if pygame.event.get():
-                    break
-                if n != joystick.get_axis(1):
-                    break
-        n = joystick.get_axis(1)
-        if 0.4<n :
-            while True:
-                n =joystick.get_axis(1)
-                ser.write(b'1')
-                print('1')
-                if pygame.event.get():
-                    break
-                if n != joystick.get_axis(1):
-                    break
-        n = joystick.get_axis(0)
-        if 0.4<n :
-            while True:
-                ser.write(b'2')
-                print('2')
-                if pygame.event.get():
-                    break
-                if n != joystick.get_axis(0):
-                    break
-        n = joystick.get_axis(0)
-        if -0.4>n :
-            while True:
-                n =joystick.get_axis(0)
-                ser.write(b'3')
-                print('3')
-                if pygame.event.get():
-                    break
-                if n != joystick.get_axis(0):
-                    break
+        command = None
 
+        # ボタン
+        if target_controller.get_button(0) == 1:  # Green A button
+            command = b'A'
+        elif target_controller.get_button(1) == 1:  # Red B button
+            command = b'B'
+        elif target_controller.get_button(2) == 1:  # Blue X button
+            command = b'X'
+        elif target_controller.get_button(3) == 1:  # Yellow Y button
+            command = b'Y'
 
-        #Cross Button ( front = north )
-        elif 0.9<joystick.get_hat(0)[1]:
-            while True:
-                ser.write(b'0')
-                print(0)
-                if pygame.event.get():
-                    break
+        elif n >= 0.4 and m >= 0.4:
+            command = b'1'
+        elif n < 0.4 and n > -0.4 and m >= 0.4:
+            command = b'2'
+        elif n <= 0.4 and m >= 0.4:
+            command = b'3'
+        elif n >= 0.4 and m < 0.4 and m > -0.4:
+            command = b'4'
+        elif n < 0.4 and n > -0.4 and m < 0.4 and m > -0.4:
+            command = b'5'
+        elif n <= 0.4 and m < 0.4 and m > -0.4:
+            command = b'6'
+        elif n >= 0.4 and m <= -0.4:
+            command = b'7'
+        elif n < 0.4 and n > -0.4 and m <= -0.4:
+            command = b'8'
+        elif n <= -0.4 and m <= -0.4:
+            command = b'9'
 
-        elif -0.9>joystick.get_hat(0)[1]:
-            while True:
-                ser.write(b'1')
-                print('1')
-                if pygame.event.get():
-                    break
+        if command is not None:
+            ser.write(command)
+            print(command.decode())  # バイトを文字列に変換して出力
 
-        elif 0.9<joystick.get_hat(0)[0]:
-            while True:
-                ser.write(b'2')
-                print('2')
-                if pygame.event.get():
-                    break
-
-        elif -0.9>joystick.get_hat(0)[0]:
-            while True:
-                ser.write(b'3')
-                print('3')
-                if pygame.event.get():
-                    break
-
-
-
-        #button
-        elif 1==joystick.get_button(0):#Green A button
-            ser.write(b'4')
-            print('4')
-        elif 1==joystick.get_button(1):#Red B button
-            ser.write(b'5')
-            print('5')
-        elif 1==joystick.get_button(2):#Blue X button
-            ser.write(b'6')
-            print('6')
-        elif 1==joystick.get_button(3):#Yellow Y button
-            ser.write(b'7')
-            print('7')
+        time.sleep(0.01)

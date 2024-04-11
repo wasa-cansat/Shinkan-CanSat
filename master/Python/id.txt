@@ -1,0 +1,11 @@
+#controller name
+
+Controller (Gamepad F310)
+Controller (Wireless Gamepad F710)
+
+#esp32 hdid
+
+1.9C9C1FCBE1C6
+2.9C9C1FCBD5EE
+3.
+4.

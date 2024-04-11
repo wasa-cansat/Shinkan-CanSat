@@ -19,7 +19,7 @@ void backward(uint32_t pwm);
 void stop(void);
 
 
-uint32_t pwm = 200;
+uint32_t pwm = 250;
 bool boost = false;
 
 void setup() {
