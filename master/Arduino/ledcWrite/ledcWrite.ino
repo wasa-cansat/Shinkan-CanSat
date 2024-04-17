@@ -78,9 +78,6 @@ void loop() {
     else{
       stop();
     }
-  }else{
-    delay(10);
-    stop();
   }
 }
 

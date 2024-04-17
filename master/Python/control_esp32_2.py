@@ -35,52 +35,53 @@ for p in ports:
         
 #Main program
 done = False
-while True:
-    while not done:
-        print("Event")
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
 
-                ser.close()
-                done = True
+while not done:
+    print("Event")
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            print("a")
 
-        # 左スティックの値を取得
-        n = target_controller.get_axis(1)
-        m = target_controller.get_axis(3)
+            ser.close()
+            done = True
 
-        command = None
+    # 左スティックの値を取得
+    n = target_controller.get_axis(1)
+    m = target_controller.get_axis(3)
 
-        # ボタン
-        if target_controller.get_button(0) == 1:  # Green A button
-            command = b'A'
-        elif target_controller.get_button(1) == 1:  # Red B button
-            command = b'B'
-        elif target_controller.get_button(2) == 1:  # Blue X button
-            command = b'X'
-        elif target_controller.get_button(3) == 1:  # Yellow Y button
-            command = b'Y'
+    command = None
 
-        elif n >= 0.4 and m >= 0.4:
-            command = b'1'
-        elif n < 0.4 and n > -0.4 and m >= 0.4:
-            command = b'2'
-        elif n <= 0.4 and m >= 0.4:
-            command = b'3'
-        elif n >= 0.4 and m < 0.4 and m > -0.4:
-            command = b'4'
-        elif n < 0.4 and n > -0.4 and m < 0.4 and m > -0.4:
-            command = b'5'
-        elif n <= 0.4 and m < 0.4 and m > -0.4:
-            command = b'6'
-        elif n >= 0.4 and m <= -0.4:
-            command = b'7'
-        elif n < 0.4 and n > -0.4 and m <= -0.4:
-            command = b'8'
-        elif n <= -0.4 and m <= -0.4:
-            command = b'9'
+    # ボタン
+    if target_controller.get_button(0) == 1:  # Green A button
+        command = b'A'
+    elif target_controller.get_button(1) == 1:  # Red B button
+        command = b'B'
+    elif target_controller.get_button(2) == 1:  # Blue X button
+        command = b'X'
+    elif target_controller.get_button(3) == 1:  # Yellow Y button
+        command = b'Y'
 
-        if command is not None:
-            ser.write(command)
-            print(command.decode())  # バイトを文字列に変換して出力
+    elif n >= 0.4 and m >= 0.4:
+        command = b'1'
+    elif n < 0.4 and n > -0.4 and m >= 0.4:
+        command = b'2'
+    elif n <= 0.4 and m >= 0.4:
+        command = b'3'
+    elif n >= 0.4 and m < 0.4 and m > -0.4:
+        command = b'4'
+    elif n < 0.4 and n > -0.4 and m < 0.4 and m > -0.4:
+        command = b'5'
+    elif n <= 0.4 and m < 0.4 and m > -0.4:
+        command = b'6'
+    elif n >= 0.4 and m <= -0.4:
+        command = b'7'
+    elif n < 0.4 and n > -0.4 and m <= -0.4:
+        command = b'8'
+    elif n <= -0.4 and m <= -0.4:
+        command = b'9'
 
-        time.sleep(0.01)
+    if command is not None:
+        ser.write(command)
+        print(command.decode())  # バイトを文字列に変換して出力
+
+    time.sleep(0.001)
